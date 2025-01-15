@@ -302,7 +302,14 @@ if (isset($_GET['leave'])) {
                         participantsList.appendChild(listItem);
                     });
                 });
-        }, 5000); // Poll every 5 seconds
+        }, 2000); // Poll every 5 seconds
+
+        // Notify the server when the user is about to leave
+        window.addEventListener('beforeunload', function () {
+            fetch(`leave_participant.php?session_code=${sessionCode}&username=${"<?php echo $username; ?>"}&leave=true`, {
+                method: 'GET',
+            });
+        });
     </script>
 
 </body>
