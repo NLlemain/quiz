@@ -5,6 +5,7 @@ session_start();
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuizPro</title>
@@ -30,11 +31,11 @@ session_start();
         .header .logo {
             font-size: 24px;
             font-weight: bold;
-            color: #4F46E5;
+            color:rgb(40, 36, 103);
         }
 
         .header .login {
-            color: #4F46E5;
+            color:rgb(40, 34, 146);
         }
         .header .right-section {
             display: flex;
@@ -372,5 +373,6 @@ session_start();
             }, 3000); // Hide after 3 seconds
         <?php } ?>
     </script>
+    <!-- nog een iets magicsh in het toverland -->
 </body>
 </html>
