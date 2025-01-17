@@ -1,11 +1,12 @@
 <?php
-session_start();
+// Start de sessie
+session_start(); 
 
-// Destroy the session to log out the user
-session_unset();
-session_destroy();
+// Vernietig alle sessiegegevens om de gebruiker uit te loggen
+session_unset(); // Verwijdert alle variabelen die in de sessie zijn opgeslagen
+session_destroy(); // Vernietigt de sessie zelf
 
-// Redirect the user to the login page
-header("Location: login.php");
-exit();
+// Redirect de gebruiker naar de inlogpagina
+header("Location: login.php"); // Verstuurt de gebruiker naar de 'login.php' pagina
+exit(); // Zorgt ervoor dat het script wordt gestopt na de redirect
 ?>

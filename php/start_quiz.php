@@ -1,39 +1,39 @@
 <?php
-session_start();  // Start the session to check the login status
+session_start();  // Start de sessie om de loginstatus te controleren
 
-// Database connection
+// Verbind met de database
 $servername = "localhost";
-$username = "root"; // Default XAMPP MySQL username
-$password = ""; // Default XAMPP MySQL password
-$dbname = "quizpro";
+$username = "root"; // Standaard XAMPP MySQL gebruikersnaam
+$password = ""; // Standaard XAMPP MySQL wachtwoord
+$dbname = "quizpro"; // De naam van de database
 
-// Create connection
+// Maak de verbinding
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+// Controleer of de verbinding succesvol is
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Verbinding mislukt: " . $conn->connect_error);
 }
 
-// Check if the user is logged in by checking the session
+// Controleer of de gebruiker is ingelogd door de sessie te controleren
 if (!isset($_SESSION['username'])) {
-    // If not logged in, redirect to the login page
+    // Als de gebruiker niet is ingelogd, wordt hij doorgestuurd naar de inlogpagina
     header('Location: login.php');
     exit();
 }
 
-$username = $_SESSION['username'];  // Get the logged-in user's username
+$username = $_SESSION['username'];  // Verkrijg de gebruikersnaam van de ingelogde gebruiker
 
-// Get the session code from the URL
+// Verkrijg de sessiecode uit de URL
 if (isset($_GET['session_code'])) {
     $session_code = $_GET['session_code'];
 
-    // Fetch the game session details using the session code
+    // Haal de sessiegegevens op via de sessiecode
     $sql = "SELECT * FROM game_sessions WHERE session_code = ?";
     $stmt = $conn->prepare($sql);
 
     if ($stmt === false) {
-        die('Error preparing statement: ' . $conn->error);
+        die('Fout bij het voorbereiden van de statement: ' . $conn->error);
     }
 
     $stmt->bind_param("s", $session_code);
@@ -46,44 +46,44 @@ if (isset($_GET['session_code'])) {
         $host_username = $session['host_username'];
         $game_state = $session['game_state'];
 
-        // If the logged-in user is not the host, they should only see the "Join" button
+        // Als de ingelogde gebruiker geen host is, moet deze alleen de "Join" knop zien
         if ($username != $host_username) {
             $is_host = false;
         } else {
             $is_host = true;
         }
 
-        // Check if the user is already a participant in the session
+        // Controleer of de gebruiker al deelnemer is in de sessie
         $sql_check_participant = "SELECT * FROM game_participants WHERE session_code = ? AND username = ?";
         $stmt_check_participant = $conn->prepare($sql_check_participant);
 
         if ($stmt_check_participant === false) {
-            die('Error preparing check participant statement: ' . $conn->error);
+            die('Fout bij het voorbereiden van de statement om deelnemer te controleren: ' . $conn->error);
         }
 
         $stmt_check_participant->bind_param("ss", $session_code, $username);
         $stmt_check_participant->execute();
         $participant_result = $stmt_check_participant->get_result();
 
-        // If the user is not already a participant, insert them into the database
+        // Als de gebruiker nog geen deelnemer is, voeg deze dan toe aan de database
         if ($participant_result->num_rows === 0) {
             $sql_insert_participant = "INSERT INTO game_participants (session_code, username) VALUES (?, ?)";
             $stmt_insert_participant = $conn->prepare($sql_insert_participant);
 
             if ($stmt_insert_participant === false) {
-                die('Error preparing insert participant statement: ' . $conn->error);
+                die('Fout bij het voorbereiden van de statement om deelnemer in te voegen: ' . $conn->error);
             }
 
             $stmt_insert_participant->bind_param("ss", $session_code, $username);
             $stmt_insert_participant->execute();
         }
 
-        // Fetch the list of participants
+        // Haal de lijst van deelnemers op
         $sql_participants = "SELECT username FROM game_participants WHERE session_code = ?";
         $stmt_participants = $conn->prepare($sql_participants);
 
         if ($stmt_participants === false) {
-            die('Error preparing participants statement: ' . $conn->error);
+            die('Fout bij het voorbereiden van de statement voor deelnemers: ' . $conn->error);
         }
 
         $stmt_participants->bind_param("s", $session_code);
@@ -94,49 +94,49 @@ if (isset($_GET['session_code'])) {
             $participants[] = $participant['username'];
         }
     } else {
-        echo "Session not found.";
+        echo "Sessie niet gevonden.";
         exit();
     }
 } else {
-    echo "Session code not provided.";
+    echo "Sessiecode niet opgegeven.";
     exit();
 }
 
-// Handle starting the game (only allowed for the host)
+// Verwerk het starten van het spel (alleen toegestaan voor de host)
 if (isset($_POST['start_game'])) {
     if ($is_host) {
-        // Update game state to 'in_progress'
+        // Werk de spelstatus bij naar 'in_progress'
         $sql_update = "UPDATE game_sessions SET game_state = 'in_progress' WHERE session_code = ?";
         $stmt_update = $conn->prepare($sql_update);
-        
+
         if ($stmt_update === false) {
-            die('Error preparing update statement: ' . $conn->error);
+            die('Fout bij het voorbereiden van de statement om het spel te starten: ' . $conn->error);
         }
-        
+
         $stmt_update->bind_param("s", $session_code);
         $stmt_update->execute();
 
-        // Redirect to the game page (or any page where the game will be played)
+        // Stuur door naar de spelpagina (of een pagina waar het spel zal worden gespeeld)
         header("Location: play_game.php?session_code=$session_code");
         exit();
     } else {
-        echo "Only the host can start the game.";
+        echo "Alleen de host kan het spel starten.";
     }
 }
 
-// Handle participant leaving the session
+// Verwerk het verlaten van de sessie door de deelnemer
 if (isset($_GET['leave'])) {
     $sql_remove_participant = "DELETE FROM game_participants WHERE session_code = ? AND username = ?";
     $stmt_remove_participant = $conn->prepare($sql_remove_participant);
-    
+
     if ($stmt_remove_participant === false) {
-        die('Error preparing remove participant statement: ' . $conn->error);
+        die('Fout bij het voorbereiden van de statement om deelnemer te verwijderen: ' . $conn->error);
     }
 
     $stmt_remove_participant->bind_param("ss", $session_code, $username);
     $stmt_remove_participant->execute();
-    
-    header("Location: waiting_room.php?session_code=$session_code"); // Redirect after removal
+
+    header("Location: waiting_room.php?session_code=$session_code"); // Doorsturen na verwijdering
     exit();
 }
 
@@ -147,7 +147,7 @@ if (isset($_GET['leave'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waiting Room - QuizPro</title>
+    <title>Wachtkamer - QuizPro</title>
     <style>
         * {
             margin: 0;
@@ -260,11 +260,11 @@ if (isset($_GET['leave'])) {
     </div>
 
     <div class="waiting-room">
-        <h2>Waiting Room</h2>
-        <p class="session-code">Session Code: <?php echo htmlspecialchars($session_code); ?></p>
+        <h2>Wachtkamer</h2>
+        <p class="session-code">Sessiecode: <?php echo htmlspecialchars($session_code); ?></p>
         
         <div class="participants">
-            <h3>Participants:</h3>
+            <h3>Deelnemers:</h3>
             <ul id="participants-list">
                 <?php foreach ($participants as $participant) { ?>
                     <li><?php echo htmlspecialchars($participant); ?></li>
@@ -275,20 +275,20 @@ if (isset($_GET['leave'])) {
         <p>
             <?php if ($is_host) { ?>
                 <form method="POST" action="">
-                    <button type="submit" name="start_game">Start Game</button>
+                    <button type="submit" name="start_game">Start het spel</button>
                 </form>
             <?php } else { ?>
-                <button>Waiting for the host to start the game...</button>
+                <button>Wachten op de host om het spel te starten...</button>
             <?php } ?>
         </p>
 
-        <a href="?session_code=<?php echo htmlspecialchars($session_code); ?>&leave=true" style="color: red;">Leave Session</a>
+        <a href="?session_code=<?php echo htmlspecialchars($session_code); ?>&leave=true" style="color: red;">Verlaat de sessie</a>
     </div>
 
     <script>
-        const sessionCode = "<?php echo htmlspecialchars($session_code); ?>";  // Get the session code dynamically
+        const sessionCode = "<?php echo htmlspecialchars($session_code); ?>";  // Verkrijg de sessiecode dynamisch
 
-        // Poll the server every 5 seconds to check the updated list of participants
+        // Poll elke 2 seconden om de bijgewerkte deelnemerslijst te controleren
         setInterval(function () {
             fetch(`get_participants.php?session_code=${sessionCode}`)
                 .then(response => response.json())
@@ -302,9 +302,9 @@ if (isset($_GET['leave'])) {
                         participantsList.appendChild(listItem);
                     });
                 });
-        }, 2000); // Poll every 5 seconds
+        }, 2000); // Poll elke 2 seconden
 
-        // Notify the server when the user is about to leave
+        // Meld de server wanneer de gebruiker de pagina verlaat
         window.addEventListener('beforeunload', function () {
             fetch(`leave_participant.php?session_code=${sessionCode}&username=${"<?php echo $username; ?>"}&leave=true`, {
                 method: 'GET',
@@ -316,6 +316,6 @@ if (isset($_GET['leave'])) {
 </html>
 
 <?php
-// Close connection
+// Sluit de verbinding
 $conn->close();
 ?>

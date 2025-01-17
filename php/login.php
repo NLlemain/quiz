@@ -1,52 +1,65 @@
 <?php
-// Start the session
-session_start();
+// Start de sessie, dit zorgt ervoor dat we gegevens zoals de gebruikersnaam kunnen opslaan
+session_start(); 
 
-// Database connection
-$servername = "localhost";
-$username = "root"; // Default XAMPP MySQL username
-$password = ""; // Default XAMPP MySQL password
-$dbname = "quizpro";
+// Databaseverbinding configureren
+$servername = "localhost"; // Dit is de server waar de database zich bevindt (lokale server)
+$username = "root"; // De standaard gebruikersnaam voor MySQL in XAMPP
+$password = ""; // Het standaard wachtwoord voor MySQL in XAMPP, meestal leeg
+$dbname = "quizpro"; // De naam van de database waarmee we verbinding willen maken
 
-// Create connection
+// Maak de verbinding met de database
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+// Controleer of de verbinding succesvol is gemaakt
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    // Als er een fout is in de verbinding, stop het script en toon de foutmelding
+    die("Connection failed: " . $conn->connect_error); 
 }
 
-$error_message = "";
-//commit
-// Handle login form submission
-if (isset($_POST['login'])) {
+$error_message = ""; // Dit is een lege variabele die later gebruikt zal worden voor foutmeldingen
+
+// Verwerk de inzending van het login formulier
+if (isset($_POST['login'])) { 
+    // Verkrijg de gebruikersnaam en het wachtwoord van het formulier
     $user = $_POST['username'];
     $pass = $_POST['password'];
 
-    // Hash the password (using sha256 for this example, but bcrypt is better in real applications)
-    $hashed_pass = hash('sha256', $pass);
+    // Hash het wachtwoord (we gebruiken hier sha256, maar bcrypt is beter in echte toepassingen)
+    $hashed_pass = hash('sha256', $pass); 
 
+    // SQL-query die probeert de gebruiker te vinden in de database op basis van gebruikersnaam en wachtwoord
     $sql = "SELECT * FROM users WHERE username = ? AND password = ?";
     
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("ss", $user, $hashed_pass);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    // Voorbereid de SQL-query voor uitvoering
+    if ($stmt = $conn->prepare($sql)) { 
+        // Koppel de gebruikersnaam en het gehashte wachtwoord aan de query
+        $stmt->bind_param("ss", $user, $hashed_pass); 
+        // Voer de query uit
+        $stmt->execute(); 
+        // Verkrijg het resultaat van de query
+        $result = $stmt->get_result(); 
         
+        // Controleer of er resultaten zijn (als er een gebruiker is met deze gebruikersnaam en wachtwoord)
         if ($result->num_rows > 0) {
+            // Als de gebruiker wordt gevonden, sla de gebruikersnaam op in de sessie
             $_SESSION['username'] = $user;
-            header("Location: index.php"); // Redirect to homepage or dashboard
-            exit();
+            // Redirect de gebruiker naar de homepage of dashboard
+            header("Location: index.php"); 
+            exit(); // Stop de uitvoering van de rest van het script
         } else {
-            $error_message = "Invalid username or password.";
+            // Als geen gebruiker wordt gevonden, stel een foutmelding in
+            $error_message = "Invalid username or password."; 
         }
-        $stmt->close();
+        $stmt->close(); // Sluit de voorbereid statement
     } else {
-        $error_message = "Database query failed.";
+        // Als het voorbereiden van de query mislukt, stel een foutmelding in
+        $error_message = "Database query failed."; 
     }
 }
 
-$conn->close();
+// Sluit de verbinding met de database
+$conn->close(); 
 ?>
 
 <!DOCTYPE html>
@@ -55,7 +68,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - QuizPro</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Laadt de FontAwesome iconen -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -160,17 +173,18 @@ $conn->close();
         }
     </style>
     <script>
+        // Functie om het wachtwoord zichtbaar te maken of onzichtbaar te maken
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
             if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                eyeIcon.classList.remove("fa-eye-slash");
-                eyeIcon.classList.add("fa-eye");
+                passwordInput.type = "text"; // Maak het wachtwoord zichtbaar
+                eyeIcon.classList.remove("fa-eye-slash"); // Verwijder het gesloten oog-icoon
+                eyeIcon.classList.add("fa-eye"); // Voeg het open oog-icoon toe
             } else {
-                passwordInput.type = "password";
-                eyeIcon.classList.remove("fa-eye");
-                eyeIcon.classList.add("fa-eye-slash");
+                passwordInput.type = "password"; // Maak het wachtwoord onzichtbaar
+                eyeIcon.classList.remove("fa-eye"); // Verwijder het open oog-icoon
+                eyeIcon.classList.add("fa-eye-slash"); // Voeg het gesloten oog-icoon toe
             }
         }
     </script>
@@ -184,10 +198,10 @@ $conn->close();
     <a href="#">Help</a>
     <div class="right-section">
         <?php if (isset($_SESSION['username'])) { ?>
-            <!-- Show Logout Button -->
+            <!-- Toon de Logout knop als de gebruiker is ingelogd -->
             <a href="logout.php" class="join-button">Logout</a>
         <?php } else { ?>
-            <!-- Show Login and Register Links -->
+            <!-- Toon de Login en Register links als de gebruiker niet is ingelogd -->
             <a href="login.php" class="login">Log In</a>
             <a href="register.php" class="join-button">Sign Up</a>
         <?php } ?>
@@ -203,6 +217,7 @@ $conn->close();
                 <input type="password" id="password" name="password" placeholder="Password" required>
                 <i id="eyeIcon" class="fas fa-eye-slash" onclick="togglePassword()"></i>
             </div>
+            <!-- Toon een foutmelding als deze is ingesteld -->
             <?php if (isset($error_message)) { echo "<p style='color:red;'>$error_message</p>"; } ?>
             <button class="login-button" type="submit" name="login">Sign In</button>
         </form>

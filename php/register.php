@@ -1,67 +1,71 @@
 <?php
+// Start de sessie zodat we sessie-informatie kunnen opslaan
 session_start();
 
-// Database connection
-$servername = "localhost";
-$username = "root"; // Default XAMPP MySQL username
-$password = ""; // Default XAMPP MySQL password
-$dbname = "quizpro";
+// Verbinding maken met de database
+$servername = "localhost"; // De server waarop de database draait
+$username = "root"; // De standaard MySQL gebruikersnaam voor XAMPP
+$password = ""; // Het standaard wachtwoord voor XAMPP MySQL, meestal leeg
+$dbname = "quizpro"; // De naam van de database waarmee we verbinden
 
-// Create connection
+// Maak verbinding met de database
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+// Controleer of de verbinding met de database is gelukt
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error); // Als de verbinding niet werkt, stop het script en geef de foutmelding
 }
 
-$error_message = "";
+$error_message = ""; // Variabele om foutmeldingen op te slaan
 
+// Controleer of het registratieformulier is ingediend
 if (isset($_POST['register'])) {
-    // Get the form data
-    $user = $_POST['username'];
-    $pass = $_POST['password'];
+    // Verkrijg de gegevens van het formulier
+    $user = $_POST['username']; // Het gebruikersnaamveld
+    $pass = $_POST['password']; // Het wachtwoordveld
 
-    // Check if the username already exists
-    $sql = "SELECT * FROM users WHERE username = ?";
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("s", $user);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    // Controleer of de gebruikersnaam al bestaat in de database
+    $sql = "SELECT * FROM users WHERE username = ?"; // SQL-query om te zoeken naar een gebruiker met dezelfde gebruikersnaam
+    if ($stmt = $conn->prepare($sql)) { // Bereid de SQL-query voor
+        $stmt->bind_param("s", $user); // Bind de gebruikersnaamparameter aan de query
+        $stmt->execute(); // Voer de query uit
+        $result = $stmt->get_result(); // Verkrijg het resultaat van de query
 
+        // Als er al een gebruiker bestaat met deze gebruikersnaam
         if ($result->num_rows > 0) {
-            // User already exists
-            $error_message = "Username already taken.";
+            // Gebruiker bestaat al
+            $error_message = "Username already taken."; // Zet de foutmelding
         } else {
-            // Hash the password
-            $hashed_pass = hash('sha256', $pass);
+            // Hasht het wachtwoord voor veilige opslag
+            $hashed_pass = hash('sha256', $pass); // Gebruik de sha256 hashing methode voor het wachtwoord
 
-            // Insert the new user into the database
-            $sql = "INSERT INTO users (username, password) VALUES (?, ?)";
-            if ($stmt = $conn->prepare($sql)) {
-                $stmt->bind_param("ss", $user, $hashed_pass);
-                if ($stmt->execute()) {
-                    // Successful registration, auto-login user
-                    $_SESSION['username'] = $user;
+            // Voeg de nieuwe gebruiker toe aan de database
+            $sql = "INSERT INTO users (username, password) VALUES (?, ?)"; // SQL-query om een nieuwe gebruiker toe te voegen
+            if ($stmt = $conn->prepare($sql)) { // Bereid de SQL-query voor
+                $stmt->bind_param("ss", $user, $hashed_pass); // Bind de gebruikersnaam en het gehashte wachtwoord
+                if ($stmt->execute()) { // Voer de query uit
+                    // Succesvolle registratie, log de gebruiker automatisch in
+                    $_SESSION['username'] = $user; // Sla de gebruikersnaam op in de sessie
 
-                    // Set a success message for login
+                    // Zet een succesbericht voor de login
                     $_SESSION['login_message'] = "Registration successful! Welcome, " . $user;
 
-                    // Redirect to index.php after registration and login
+                    // Redirect de gebruiker naar de indexpagina na registratie en login
                     header("Location: index.php");
-                    exit();
+                    exit(); // Stop de uitvoering van het script na de redirect
                 } else {
-                    $error_message = "Error registering user.";
+                    $error_message = "Error registering user."; // Als er iets misgaat met de registratie
                 }
             }
         }
 
-        $stmt->close();
+        $stmt->close(); // Sluit de statement af
     } else {
-        $error_message = "Database query failed.";
+        $error_message = "Database query failed."; // Als de SQL-query niet voorbereid kan worden
     }
 }
 
+// Sluit de databaseverbinding
 $conn->close();
 ?>
 
@@ -72,6 +76,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Account - QuizPro</title>
     <style>
+        /* Stijlregels voor de pagina */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
