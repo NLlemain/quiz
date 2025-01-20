@@ -265,13 +265,66 @@ session_start();
                 transform: translateY(0);
             }
         }
+        @media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .header .right-section {
+        padding-left: 0;
+        margin-top: 10px;
+    }
+    .content {
+        flex-direction: column;
+        padding: 20px;
+    }
+    .content .image-section {
+        order: 2;
+        padding: 20px 0;
+    }
+    .content .main-section {
+        order: 1;
+        padding: 20px;
+    }
+    .main-section input {
+        width: 100%;
+        margin-right: 0;
+    }
+    .features {
+        flex-direction: column;
+        align-items: center;
+    }
+    .feature {
+        width: 80%;
+        margin: 10px 0;
+    }
+    .popular-quizzes {
+        margin: 50px 0;
+    }
+    .quiz {
+        width: 90%;
+    }
+    .promo-section {
+        margin-left: 0;
+        padding: 20px;
+    }
+    .footer .footer-section {
+        flex-direction: column;
+        align-items: center;
+    }
+    .footer .footer-section div {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+}
     </style>
 </head>
 <body>
     <div class="header">
         <div class="logo">QuizPro</div>
         <a href="#">Browse</a>
-        <a href="#">Create</a>
+        <a href="create_quiz.php">Create</a>
         <a href="#">Teach</a>
         <a href="#">Help</a>
         <div class="right-section">
