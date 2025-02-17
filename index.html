@@ -8,17 +8,13 @@
 <body>
     <div class="header">
         <div class="logo">QuizPro</div>
-        <a href="">Browse</a>
-        <a href="create_quiz.php">Create</a>
+        <a href="#">Browse</a>
+        <a href="#">Create</a>
         <a href="#">Teach</a>
         <a href="#">Help</a>
         <div class="right-section">
-            <?php if (isset($_SESSION['username'])) { ?>
-                <a href="logout.php" class="join-button">Logout</a>
-            <?php } else { ?>
-                <a href="login.php" class="login">Log In</a>
-                <a href="register.php" class="join-button">Sign Up</a>
-            <?php } ?>
+                <a href="#" class="login">Log In</a>
+                <a href="#" class="join-button">Sign Up</a>
         </div>
     </div>
     
@@ -43,17 +39,17 @@
     
     <div class="features">
         <div class="feature">
-            <img src="feature1.png" alt="features Image">
+            <img src="fotos/feature1.png" alt="features Image">
             <h3>Easy Creation</h3>
             <p>Create quizzes in minutes with our intuitive editor.</p>
         </div>
         <div class="feature">
-            <img src="feature2.png" alt="features Image">
+            <img src="fotos/feature2.png" alt="features Image">
             <h3>Live Gameplay</h3>
             <p>Join live games and see real-time feedback in the classroom.</p>
         </div>
         <div class="feature">
-            <img src="feature3.png" alt="features Image">
+            <img src="fotos/feature3.png" alt="features Image">
             <h3>Detailed Reports</h3>
             <p>Get insights with comprehensive analytics and reports.</p>
         </div>
@@ -62,7 +58,7 @@
     <div class="popular-quizzes">
         <h1>Popular Quizzes</h1>
         <div class="quiz">
-            <img src="quiz img.png" alt="Quiz Image">
+            <img src="fotos/quiz img.png" alt="Quiz Image">
             <h4>Math Challenge</h4>
             <p>Test your math skills with this challenging quiz.</p>
         </div>
