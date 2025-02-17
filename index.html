@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizPro</title>
+<link rel="stylesheet" href="css/style.css"></head>
+<body>
+    <div class="header">
+        <div class="logo">QuizPro</div>
+        <a href="">Browse</a>
+        <a href="create_quiz.php">Create</a>
+        <a href="#">Teach</a>
+        <a href="#">Help</a>
+        <div class="right-section">
+            <?php if (isset($_SESSION['username'])) { ?>
+                <a href="logout.php" class="join-button">Logout</a>
+            <?php } else { ?>
+                <a href="login.php" class="login">Log In</a>
+                <a href="register.php" class="join-button">Sign Up</a>
+            <?php } ?>
+        </div>
+    </div>
+    
+    <div class="content">
+        <div class="image-section">
+            <img src="https://strongtestimonials.com/wp-content/uploads/2021/02/wordpress-quiz-plugins.jpg" alt="Placeholder Image">
+        </div>
+        <div class="main-section">
+            <h1>Make Learning Awesome!</h1>
+            <p>Create, play and share engaging quizzes. Perfect for classrooms, training, and fun!</p>
+            <!-- Updated Form Section -->
+            <form id="joinQuizForm" onsubmit="return handleJoinQuiz(event)">
+                <input type="text" id="sessionCode" placeholder="Enter Code">
+                <button type="submit" class="join-button">Join Game</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="textforfeatures">
+        <H1>Everything you need for engaging quizzes</H1>
+    </div>
+    
+    <div class="features">
+        <div class="feature">
+            <img src="feature1.png" alt="features Image">
+            <h3>Easy Creation</h3>
+            <p>Create quizzes in minutes with our intuitive editor.</p>
+        </div>
+        <div class="feature">
+            <img src="feature2.png" alt="features Image">
+            <h3>Live Gameplay</h3>
+            <p>Join live games and see real-time feedback in the classroom.</p>
+        </div>
+        <div class="feature">
+            <img src="feature3.png" alt="features Image">
+            <h3>Detailed Reports</h3>
+            <p>Get insights with comprehensive analytics and reports.</p>
+        </div>
+    </div>
+
+    <div class="popular-quizzes">
+        <h1>Popular Quizzes</h1>
+        <div class="quiz">
+            <img src="quiz img.png" alt="Quiz Image">
+            <h4>Math Challenge</h4>
+            <p>Test your math skills with this challenging quiz.</p>
+        </div>
+    </div>
+    
+    <div class="promo-section">
+        <h2>Ready to make learning fun?</h2>
+        <p>Join millions of teachers and students who are already using our platform to create engaging learning experiences.</p>
+        <button class="get-started-button">Get Started Free</button>
+    </div>
+
+    <div class="footer">
+        <div class="footer-section">
+            <div>
+                <h4>QuizPro</h4>
+                <p>Making learning awesome since 2025</p>
+            </div>
+            <div>
+                <h4>Product</h4>
+                <p>Features</p>
+                <p>Pricing</p>
+                <p>Templates</p>
+            </div>
+            <div>
+                <h4>Resources</h4>
+                <p>Help Center</p>
+                <p>Blog</p>
+                <p>Community</p>
+            </div>
+            <div>
+                <h4>Connect</h4>
+                <p>Follow us on social media</p>
+            </div>
+        </div>
+        <p>© 2025 QuizPro. All rights reserved.</p>
+    </div>
+
+    <!-- Notification -->
+    <div id="loginNotification" class="notification">Welcome back, <?php echo $_SESSION['username']; ?>!</div>
+</body>
+</html>
